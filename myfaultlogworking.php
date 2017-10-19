@@ -1,5 +1,7 @@
 <?php require_once 'includes/header.php'; ?>
-<?php require_once 'php_action/fetchMyfault.php'; ?> 
+
+
+<?php require_once 'php_action/fetchFaultLog.php';?>
 
 <div class="row">
 	<div class="col-md-12">
@@ -30,7 +32,7 @@
    			<th>Custodian Name</th>
    			<th>resolution Path</th>
    			<th>Date Logged</th>
-   			<th>Status</th>
+   			<th>Date Resolved</th>
    			<th>Logged by</th>
    			<th>Status</th>
    			<th>Marked Resolved by</th>
@@ -38,7 +40,33 @@
    			<th>Changes Made By</th>
    		</tr>
    	</thead>	
+      <?php
+    while($row = mysqli_fetch_array($result))
+     
+    {
+      echo '
+      <tr>
+        <td>'.$row["fault_id"].'</td>
+        <td>'.$row["terminal_name"].'</td>
+        <td>'.$row["terminal_FK"].'</td>
+        
+        <td>'.$row["atm_brand"].'</td>
+        <td>'.$row["vendor"].'</td>
+        <td>'.$row["nature_of_fault"].'</td>
+        <td>'.$row["custodian_name"].'</td>
+        <td>'.$row["resolution_path"].'</td>
+        <td>'.$row["date_logged"].'</td>
+        <td>'.$row["date_resolved"].'</td>
+        <td>'.$row["status"].'</td>
+        <td>'.$row["logged_by"].'</td>
+        <td>'.$row["markedresolvedby"].'</td>
+        <td>'.$row["reopenedby"].'</td>
+        <td>'.$row["changesmadeby"].'</td>
 
+        </tr>
+      ';
+    }
+    ?>
    </table>
   </div>
 </div>
@@ -47,26 +75,42 @@
 	</div><!-- /col-md-12 -->
 <div><!-- /row --> 
 
-  <div class="modal fade" tabindex="-1" role="dialog" id="addFaultModal">
+<div class="modal fade" tabindex="-1" role="dialog" id="addFaultModal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title"><i class="fa fa-plus"> </i> Add Fault</h4>
-      </div>
+      </div>  
 
-      <form class="form-horizontal" id="submitFaultForm" action="php_action/createFaultLog.php" method="POST">
+      <form class="form-horizontal" id="submitFaultForm" name ="submitFaultForm" action="php_action/createFaultLog.php" method="POST">
       <div class="modal-body">
       
-  <div class="form-group"> 
+      <div class="add-terminal-messages"> </div>
+  <div class="form-group">
          <label for="terminalId" class="col-sm-3 control-label">Terminal ID</label>
         <div class="col-sm-9">
-               <select class="form-control" id="terminalId" name="terminalId">
-             <!-- <?php// while();?> -->
+            <select class="form-control" id="terminalId" name="terminalId">
+                <option value="">Terminal Id</option>
+                <?php while($ID =  mysqli_fetch_array($result2)):; ?>
+                
+                <option> <?php echo $ID["terminal_id"]; ?></option>
+                <?php endwhile;?>
+
+             
 
             </select> 
       </div>
+    </div>
+   <div class="form-group">
+     <!--   <label for="terminalfk" class="col-sm-3 control-label">Terminal fk</label> -->
+        <div class="col-sm-9">
+      
+          <input type="hidden" class="form-control" id="terminalFK" name="terminalFK">
+          
+        </div>
+  </div>
       <div class="form-group">
         <label for="terminalName" class="col-sm-3 control-label">Terminal Name</label>
         <div class="col-sm-9">
@@ -82,11 +126,7 @@
   <div class="form-group">
         <label for="vendor" class="col-sm-3 control-label">Vendor</label>
         <div class="col-sm-9">
-           <select class="form-control" id="vendor" name="vendor">
-              <option value="">~~SELECT~~</option>
-              <option value="Onsite">Onsite</option>
-              <option value="Offsite">Offsite</option>
-            </select> 
+          <input type="text" class="form-control" id="vendor" name="vendor" placeholder="vendor">
         </div>
   </div>
 
@@ -120,14 +160,14 @@
   <div class="form-group">
         <label for="dateLogged" class="col-sm-3 control-label">Date Logged</label>
         <div class="col-sm-9">
-          <input type="text" class="form-control" id="dateLogged" name="dateLogged" placeholder="date Logged">
+          <input type="datetime-local" class="form-control" id="dateLogged" name="dateLogged" placeholder="date Logged">
         </div>
   </div>
 
   <div class="form-group">
         <label for="dateResolved" class="col-sm-3 control-label">Date Resolved</label>
         <div class="col-sm-9">
-          <input type="text" class="form-control" id="dateResolved" name="dateResolved" placeholder="Date Resolved">
+          <input type="datetime-local" class="form-control" id="dateResolved" name="dateResolved" placeholder="Date Resolved">
         </div>
   </div>
 
@@ -137,6 +177,8 @@
           <input type="text" class="form-control" id="status" name="status" placeholder="status">
         </div>
   </div>
+
+
   <div class="form-group">
         <label for="loggedBy" class="col-sm-3 control-label">Logged By</label>
         <div class="col-sm-9">
@@ -144,11 +186,30 @@
         </div>
   </div>
 
+  <div class="form-group">
+        <label for="status" class="col-sm-3 control-label">markedResolvedBy</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="markedResolvedBy" name="markedResolvedBy" placeholder="markedResolvedBy">
+        </div>
+  </div>
+  <div class="form-group">
+        <label for="status" class="col-sm-3 control-label">reOpenedBy</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="reOpenedBy" name="reOpenedBy" placeholder="reOpenedBy">
+        </div>
+  </div>
+  <div class="form-group">
+        <label for="status" class="col-sm-3 control-label">changesMadeBy</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="changesMadeBy" name="changesMadeBy" placeholder="changesMadeBy">
+        </div>
+  </div>
+
   
        </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="submit" class="btn btn-primary" id="createTerminalBtn" data-loading-text="Loading...">Save changes</button>
       </div>
 
       </form>
@@ -193,5 +254,8 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<script type="text/javascript" src="custom/js/myfaultlog.js"></script>
+
+<script type="text/javascript" src="custom/js/myfaultlogworking.js"></script>
+
+
 <?php require_once 'includes/footer.php'; ?>  

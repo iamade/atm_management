@@ -4,13 +4,39 @@ $(document).ready(function()  {
 //active top navbar myFault
 
 $("#topNavMyFaultLog").addClass('active');
-
-manageFaultLogTable = $('#manageFaultLogTable').DataTable({
-'ajax' : 'php_action/fetchMyfault.php',
-'order': [0,1,2,3,4,5,6,7]
-
+$(document).ready(function()
+{
+  $('#manageFaultLogTable').DataTable();
 
 });
+
+$(document).ready(function()
+{
+  $('#terminalId').change(function(){
+
+  	var terminalId = $(this).val();
+
+  	$.ajax({
+  		url: "loadfaultyterminaldata.php",
+  		method:"POST",
+  		data:{terminalId:terminalId},
+  		// dataType:'json',
+  		success:function(data){
+  			$('#terminalName').val(data.terminalName);
+  			$('#atmBrand').val(data.atmBrand);
+  			$('#vendor').val(data);
+  			$('#custodianName').val(data.custodianName);
+  			$('#custodianNumber').val(data);
+  			$('#loggedBy').val(data);
+
+
+  		}
+  	})
+
+  })
+
+});
+
 
 //on click on submit fault form modal
 $("#addFaultModalBtn").unbind('click').bind('click', function(){

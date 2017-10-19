@@ -12,9 +12,9 @@ $output = array('data' => array());
 
 if($result->num_rows > 0) {
 	while($row = $result->fetch_array()) {
-		  // echo "<pre>";
-		  // print_r($row);
-		  // echo "</pre>";
+		 //  echo "<pre>";
+		 //   print_r($row);
+		 // echo "</pre>";
 		$atmId = $row[0];
 		
 
@@ -40,9 +40,11 @@ if($result->num_rows > 0) {
 	
 } // /if
 
-$connect->close();
 
 echo json_encode($output);
+
+
+$connect->close();
 
 
  

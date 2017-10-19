@@ -1,16 +1,52 @@
 var manageFaultLogTable;
 
+// $(document).ready(function(){  
+//            $.datepicker.setDefaults({  
+//                 dateFormat: 'yy-mm-dd'   
+//            });  
+//            $(function(){  
+//                 $("#dateLogged").datepicker();  
+//                 $("#dateResolved").datepicker();  
+//            });  
+// });
 $(document).ready(function()  {
 //active top navbar myFault
 
 $("#topNavMyFaultLog").addClass('active');
-
-manageFaultLogTable = $('#manageFaultLogTable').DataTable({
-'ajax' : 'php_action/fetchMyfault.php',
-'order': [0,1,2,3,4,5,6,7]
-
+$(document).ready(function()
+{
+  $('#manageFaultLogTable').DataTable();
 
 });
+
+$(document).ready(function()
+{
+  $('#terminalId').change(function(){
+
+  	var terminalId = $(this).val();
+
+  	$.ajax({
+  		url: "loadfaultyterminaldata.php",
+  		method:"POST",
+  		data:{terminalId:terminalId},
+  	    dataType:'json',
+  		success:function(data){
+  			$('#terminalName').val(data[0]);
+  			$('#atmBrand').val(data[1]);
+  			$('#vendor').val(data[2]);
+  			$('#custodianName').val(data[3]);
+  			$('#custodianNumber').val(data[4]);
+  		//	$('#loggedBy').val(data[]);
+  			$('#terminalFK').val(data[5]);
+
+
+  		}
+  	})
+
+  })
+
+});
+
 
 //on click on submit fault form modal
 $("#addFaultModalBtn").unbind('click').bind('click', function(){
@@ -27,19 +63,22 @@ $("#addFaultModalBtn").unbind('click').bind('click', function(){
 
 
 		var terminalId = $("#terminalId").val();
-		var terminalName = $("#terminalName").val();
-		var atmBrand = $("#atmBrand").val();
+		var terminalName = $("#terminalName").val(data[0]);
+		var atmBrand = $("#atmBrand").val(data[1]);
 		var natureOfFault  = $("#natureOfFault").val();
 		 var custodianNumber = $("#custodianNumber").val();
-		 var vendor = $("#vendor").val();
+		 var vendor = $("#vendor").val(data[2]);
 		 var resolutionPath = $("#resolutionPath").val();
-		 var custodianName = $("#custodianName").val();
+		 var custodianName = $("#custodianName").val(data[3]);
 		 var dateLogged = $("#dateLogged").val();
 		 var dateResolved = $("#dateResolved").val();
-		 var custodianName = $("#custodianName").val();
+		 var custodianNumber = $("#custodianNumber").val(data[4]);
 		 var status = $("#status").val();
-		 var loggedBy = $("#loggedBy").val();
-		
+		 var loggedBy = $("#loggedBy").val(data[5]);
+		 var markedResolvedBy = $("#markedResolvedBy").val();
+		 var reOpenedBy = $("#reOpenedBy").val();
+		 var changesMadeBy = $("#changesMadeBy").val();
+			
 
 
 if(terminalId == "") {
@@ -92,29 +131,45 @@ if(vendor == "") {
 
 }
 
-if(resolutionPath == "") {
-	$("#resolutionPath").after('<p class = "text-danger"> resolutionPath field is required </p>');
-	$("#resolutionPath").closest('.form-group').addClass('has-error');
-} else { 
-//remove error text field 
-	$("#resolutionPath").find('.text-danger').remove();
-	$("#resolutionPath").closest('.form-group').addClass('has-success'); 
-
-}
 
 if(terminalId && terminalName) {
 var form = $(this);
 
+//button loading
+$("#createTerminalBtn").buton('loading');
+
 $.ajax({
-	url: form.attr("action"),
+	url: form.attr('action'),
 	type: form.attr('method'),
 	data: form.serialize(),
 	dataType: 'json',
 	success: function(response) {
-		if(response.success == true) {
-			
-		}
-	}
+		//button loading
+		$("#createTerminalBtn").button('reset');
+
+		if(response.success == true){
+			// reload the manage fault Table 
+			manageFaultLogTable.ajax.reload(null, false);
+
+			//reset the form text
+			 $("#submitFaultForm")[0].reset();
+			 //remove the error text
+			 $(".text-danger").remove();
+			 //remove the form error
+			 $(".form-group").removeClass('has-error').removeClass('has-success');
+
+			 $("#add-brand-messages").html('<div class="alert alert-success">'+
+				  '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+				  '<strong><i class="glyphicon glyphicon-ok-sign"></i></strong>'+ response.messages +
+				'</div>');
+
+			  $(".alert-success").delay(500).show(10, function(){
+			  		$(this).delay(3000).hide(10, function(){
+			  			$(this).remove();
+			  		});
+			  });// alert
+		}// if
+ 	}
 
 })
 
